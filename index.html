@@ -82,6 +82,12 @@ input:disabled{opacity:.45}
 .tn.sky{color:#4fa3e0}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .tn.sky{color:#8cc4f2}}
 :root[data-theme="dark"] .tn.sky{color:#8cc4f2}
+.cloud{margin:0 4px 14px;font-size:13px;color:var(--mute)}
+.cloud .cr{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.cloud b{color:var(--ink);font-weight:700;word-break:break-all}
+.cloud button{min-height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
+.cloud .go{background:var(--feed);border-color:var(--feed);color:var(--fabink)}
+.cloud .cerr{margin-top:6px;color:var(--danger);font-weight:600}
 .tw{background:var(--card);border-radius:20px;overflow:hidden}
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
 .tbl th{font-size:11px;font-weight:700;color:var(--mute);padding:10px 2px 8px;text-align:center;border-bottom:1px solid var(--line)}
@@ -112,6 +118,7 @@ input:disabled{opacity:.45}
 <main>
   <h1>Dagoverzicht</h1>
   <p class="sub" id="today"></p>
+  <div class="cloud" id="cloudBar"></div>
 
   <section class="rings" aria-label="Vandaag">
     <div class="ringbox">
@@ -217,7 +224,7 @@ var KEY='babydashboard-v1', MAX=8, mem=null;
 var state={feeds:[],poop:[],pee:[]};
 function evs(v,k){if(Array.isArray(v))return v;var out=[];if(v&&typeof v==='object')Object.keys(v).forEach(function(d){for(var i=0;i<(+v[d]||0);i++){var e={id:'mig-'+k+'-'+d+'-'+i,date:d,time:''};if(k==='poop')e.color='';out.push(e);}});return out;}
 function load(){try{var r=localStorage.getItem(KEY);if(r){var s=JSON.parse(r);state.feeds=s.feeds||[];state.poop=evs(s.poop,'poop');state.pee=evs(s.pee,'pee');}}catch(e){if(mem)state=mem;}}
-function persist(){mem=state;try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function persist(){saveLocal();cloudSync();}
 function pad(n){return (n<10?'0':'')+n}
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
 function $(id){return document.getElementById(id)}
@@ -304,7 +311,7 @@ function impFeeds2(rows,r){rows.forEach(function(o){var date=nDate(o.datum);
   var dup=state.feeds.some(function(f){return (o.id&&f.id===o.id)||(f.b1&&(f.date+'|'+f.b1.side+'|'+(f.b1.start||'slaap')+'|'+(f.b2&&f.b2.start||''))===key)});
   if(dup){r.dup++;return;}
   state.feeds.push({id:o.id||('imp-'+key),date:date,sort:b1.start||'00:00',b1:b1,b2:b2,total:b1.min+(b2?b2.min:0)});r.feeds++;});}
-function renderAll(){renderRings();renderList();renderNext();renderTimer();}
+function renderAll(){renderRings();renderList();renderNext();renderTimer();renderCloud();}
 
 /* ---- poep/plas ---- */
 /* ---- poep, plas en tabs ---- */
@@ -417,6 +424,7 @@ $('exp').onclick=async function(){
   try{localStorage.setItem('babydashboard-lastbackup',s);}catch(e){}
   msg('Alle 3 de bestanden zijn opgeslagen ('+s+').');};
 if(window.claude&&claude.use){claude.use('downloads').then(function(d){dl=d;if(d)$('exp').hidden=false;else msg('Opslaan van bestanden werkt niet in deze weergave. Importeren kan wel.');}).catch(function(){});}
+else{dl={save:function(r){var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.data],{type:'text/csv'}));a.download=r.filename;document.body.appendChild(a);a.click();a.remove();return Promise.resolve({status:'saved'});}};$('exp').hidden=false;}
 $('impBtn').onclick=function(){$('imp').click()};
 function nDate(s){var m=/^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s);if(m)return m[1]+'-'+pad(+m[2])+'-'+pad(+m[3]);m=/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})$/.exec(s);return m?m[3]+'-'+pad(+m[2])+'-'+pad(+m[1]):null;}
 function nTime(s){var m=/^(\d{1,2})[:.](\d{2})$/.exec(s);return m&&+m[1]<24&&+m[2]<60?pad(+m[1])+':'+m[2]:null;}
@@ -460,9 +468,80 @@ $('imp').onchange=async function(ev){var fs=Array.prototype.slice.call(ev.target
   msg(t,r.skip>0||r.unk>0);};
 showLast();
 
+/* ---- online synchronisatie (Firebase) ---- */
+function C(){return window.cloudApi||null}
+var cuser=null,cerr='',remote={feeds:{},poop:{},pee:{}};
+function saveLocal(){mem=state;try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function fail(e){cerr=(e&&e.code)||'fout';renderCloud();}
+function cloudSync(){var api=C();if(!api||!cuser)return;
+  ['feeds','poop','pee'].forEach(function(k){var cur={};
+    state[k].forEach(function(e){cur[e.id]=1;if(!remote[k][e.id]){remote[k][e.id]=true;api.set(k,e).catch(fail);}});
+    Object.keys(remote[k]).forEach(function(id){if(!cur[id]){delete remote[k][id];api.del(k,id).catch(fail);}});});}
+window.__cloudUser=function(email){cuser=email;if(!email)remote={feeds:{},poop:{},pee:{}};renderCloud();};
+window.__cloudData=function(k,docs){var ids={},m={};docs.forEach(function(d){ids[d.id]=1;m[d.id]=true;});
+  var keep=state[k].filter(function(e){return !ids[e.id]&&!remote[k][e.id];});
+  remote[k]=m;state[k]=docs.concat(keep);saveLocal();renderAll();cloudSync();};
+window.__cloudError=fail;
+function msgFor(c){return c==='permission-denied'?'Geen toegang tot de database. Controleer de Firestore-regels en of je met het juiste Google-account bent ingelogd.':c==='auth/unauthorized-domain'?'Dit domein staat nog niet bij Authorized domains in Firebase.':(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request')?'':'Er ging iets mis ('+c+').';}
+function renderCloud(){var b=$('cloudBar');if(!b)return;var api=C();b.innerHTML='';
+  var row=document.createElement('div');row.className='cr';var sp=document.createElement('span');var bt=document.createElement('button');bt.type='button';
+  if(!api){sp.textContent='Opgeslagen op dit apparaat';row.appendChild(sp);}
+  else if(cuser){sp.textContent='Gesynchroniseerd als ';var bb=document.createElement('b');bb.textContent=cuser;sp.appendChild(bb);bt.textContent='Uitloggen';bt.onclick=function(){cerr='';api.logout();};row.appendChild(sp);row.appendChild(bt);}
+  else{sp.textContent='Alleen op dit apparaat opgeslagen';bt.textContent='Inloggen met Google';bt.className='go';bt.onclick=function(){cerr='';api.login().catch(fail);};row.appendChild(sp);row.appendChild(bt);}
+  b.appendChild(row);var m=msgFor(cerr);if(cerr&&m){var er=document.createElement('div');er.className='cerr';er.textContent=m;b.appendChild(er);}}
+window.__cloudReady=renderCloud;
+
 var d=new Date();$('today').textContent=d.toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});
 load();renderAll();
 })();
+</script>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,onAuthStateChanged,signOut} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {initializeFirestore,getFirestore,persistentLocalCache,persistentMultipleTabManager,collection,doc,setDoc,deleteDoc,onSnapshot} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB5fRF424mabK831Xj020aKqQfauDAQd-A",
+  authDomain: "dashboard-mees.firebaseapp.com",
+  projectId: "dashboard-mees",
+  storageBucket: "dashboard-mees.firebasestorage.app",
+  messagingSenderId: "739422178455",
+  appId: "1:739422178455:web:92947a1661119552842dd2"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+let db;
+try { db = initializeFirestore(app, {localCache: persistentLocalCache({tabManager: persistentMultipleTabManager()})}); }
+catch (e) { db = getFirestore(app); }
+
+const did = id => String(id).replace(/[\/\s]/g, '_').slice(0, 200);
+window.cloudApi = {
+  login() {
+    const p = new GoogleAuthProvider();
+    return signInWithPopup(auth, p).catch(e => {
+      if (e.code === 'auth/popup-blocked' || e.code === 'auth/operation-not-supported-in-this-environment') return signInWithRedirect(auth, p);
+      throw e;
+    });
+  },
+  logout() { return signOut(auth); },
+  set(k, e) { return setDoc(doc(db, k, did(e.id)), JSON.parse(JSON.stringify(e))); },
+  del(k, id) { return deleteDoc(doc(db, k, did(id))); }
+};
+
+let unsubs = [];
+onAuthStateChanged(auth, user => {
+  unsubs.forEach(u => u()); unsubs = [];
+  if (user) {
+    ['feeds', 'poop', 'pee'].forEach(k => {
+      unsubs.push(onSnapshot(collection(db, k),
+        snap => window.__cloudData && window.__cloudData(k, snap.docs.map(d => d.data())),
+        err => window.__cloudError && window.__cloudError(err)));
+    });
+  }
+  window.__cloudUser && window.__cloudUser(user ? user.email : null);
+});
+window.__cloudReady && window.__cloudReady();
 </script>
 </body>
 </html>
