@@ -88,7 +88,27 @@ input:disabled{opacity:.45}
 .cloud button{min-height:36px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap}
 .cloud .go{background:var(--feed);border-color:var(--feed);color:var(--fabink)}
 .cloud .cerr{margin-top:6px;color:var(--danger);font-weight:600}
-.tw{background:var(--card);border-radius:20px;overflow:hidden}
+.tw{background:var(--card);border-radius:20px;overflow-x:auto}
+.tbl{min-width:320px}
+.tbl td.ac{white-space:nowrap;padding:4px 2px}
+.ib{width:30px;height:32px;border:0;background:transparent;color:var(--mute);cursor:pointer;padding:0;border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
+.ib.dl{color:var(--danger)}
+.ib:active{background:var(--bg)}
+.save.danger{background:var(--danger);color:#fff}
+.hrow{display:flex;justify-content:space-between;align-items:center;margin:24px 0 10px}
+.hrow h2{margin:0 4px}
+.dbtn{min-height:36px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+.hist{display:none;position:fixed;inset:0;z-index:15;background:var(--bg);overflow:auto;padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(28px + env(safe-area-inset-bottom,0px))}
+.hist.open{display:block}
+.hin{max-width:520px;margin:0 auto}
+.hh{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.hh h2{margin:0 4px}
+.rings.two{margin-top:8px}
+.ringbox{position:relative}
+.gear{position:absolute;z-index:2;top:4px;right:4px;width:32px;height:32px;border:0;background:transparent;color:var(--mute);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.gear:active{background:var(--bg)}
+.sub2{font-size:11px;color:var(--mute);margin-top:2px;padding:0 4px}
+.leg{display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--mute);margin:8px 0 0}
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
 .tbl th{font-size:11px;font-weight:700;color:var(--mute);padding:10px 2px 8px;text-align:center;border-bottom:1px solid var(--line)}
 .tbl th small{display:block;font-weight:600;font-size:10px;opacity:.8}
@@ -136,13 +156,28 @@ input:disabled{opacity:.45}
       
     </div>
   </section>
-  <div class="timer"><div class="tl">Tijd sinds de start van de laatste voeding</div><div class="tn" id="timer">–</div><div class="ti" id="timerInfo"></div></div>
+  <section class="rings two" aria-label="Gemiddelden afgelopen week">
+    <div class="ringbox">
+      <div class="ring"><svg viewBox="0 0 100 100" id="avgSvg" aria-hidden="true"></svg><div class="n"><b id="avgN">&ndash;</b><small>min</small></div></div>
+      <div class="lbl">Per sessie</div><div class="sub2">afgelopen 7 dagen</div>
+    </div>
+    <div class="ringbox">
+      <div class="ring"><svg viewBox="0 0 100 100" id="dayAvgSvg" aria-hidden="true"></svg><div class="n"><b id="dayAvgN">&ndash;</b><small>min</small></div></div>
+      <div class="lbl">Per dag</div><div class="sub2" id="daySub">afgelopen 7 dagen</div>
+    </div>
+  <div class="ringbox">
+      <button type="button" class="gear" id="gearBtn" aria-label="Kleurgrenzen instellen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><div class="ring"><svg viewBox="0 0 100 100" id="todSvg" aria-hidden="true"></svg><div class="n"><b id="todN">&ndash;</b><small>min</small></div></div>
+      <div class="lbl">Vandaag</div><div class="sub2" id="todSub">per sessie</div>
+    </div>
+  </section>
+  <div class="leg"><span><span class="dot" style="background:var(--feed)"></span>Links</span><span><span class="dot" style="background:var(--pee)"></span>Rechts</span><span><span class="dot" style="background:var(--poop)"></span>Fles</span></div>
+  <div class="timer" style="margin-top:12px"><div class="tl">Tijd sinds de start van de laatste voeding</div><div class="tn" id="timer">–</div><div class="ti" id="timerInfo"></div></div>
   <div class="timer"><div class="tl">Volgende borstvoeding starten we met</div><div class="tn sky" id="nextB">–</div></div>
   <button class="diaper green" id="addFeed">Voeding toevoegen</button>
   <button class="diaper" id="addDiaper">Luier verschoond</button>
   
 
-  <h2>Schema</h2>
+  <div class="hrow"><h2>Vandaag</h2><button type="button" id="openData" class="dbtn">Data</button></div>
   <div class="seg three" id="tabs"><button type="button" data-t="feed" class="on">Voeding</button><button type="button" data-t="poop">Poep</button><button type="button" data-t="pee">Plas</button></div>
   <div id="list"></div>
 
@@ -156,10 +191,15 @@ input:disabled{opacity:.45}
 </main>
 
 
+<section class="hist" id="hist" aria-hidden="true"><div class="hin">
+  <div class="hh"><h2>Alle data</h2><button type="button" id="histClose" class="dbtn">Sluiten</button></div>
+  <div class="seg three" id="htabs"><button type="button" data-t="feed" class="on">Voeding</button><button type="button" data-t="poop">Poep</button><button type="button" data-t="pee">Plas</button></div>
+  <div id="histList"></div>
+</div></section>
 <div class="scrim" id="scrim"></div>
 
 <form class="sheet" id="sheet" onsubmit="return false" aria-hidden="true">
-  <h3>Voeding toevoegen</h3>
+  <h3 id="feedTitle">Voeding toevoegen</h3>
   <div class="seg" id="typeSeg" style="margin-bottom:4px"><button type="button" data-v="borst" class="on">Borst</button><button type="button" data-v="fles">Fles</button></div>
 
   <label class="f" for="date">Datum</label>
@@ -201,13 +241,32 @@ input:disabled{opacity:.45}
   <div class="btns"><button type="button" class="cancel" id="cancel">Annuleer</button><button type="button" class="save" id="save">Bewaar voeding</button></div>
 </form>
 
+<form class="sheet" id="cgSheet" onsubmit="return false" aria-hidden="true">
+  <h3>Kleurgrenzen &ldquo;Vandaag&rdquo;</h3>
+  <p style="margin:0;color:var(--mute);font-size:14px;line-height:1.5">De donut kleurt op basis van hoeveel minuten de gemiddelde sessie van vandaag onder het weekgemiddelde ligt.</p>
+  <label class="f" for="cgGreen">Groen tot (minuten onder het weekgemiddelde)</label>
+  <input type="number" id="cgGreen" inputmode="decimal" min="0" step="0.5">
+  <label class="f" for="cgRed">Oranje tot (minuten onder het weekgemiddelde)</label>
+  <input type="number" id="cgRed" inputmode="decimal" min="0" step="0.5">
+  <div class="note" id="cgNote"></div>
+  <button type="button" class="dbtn" id="cgReset" style="margin-top:12px">Standaard terugzetten (3 en 7)</button>
+  <div class="err" id="cgErr" role="alert"></div>
+  <div class="btns"><button type="button" class="cancel" id="cgCancel">Annuleer</button><button type="button" class="save" id="cgSave">Bewaar</button></div>
+</form>
+
+<form class="sheet" id="cfSheet" onsubmit="return false" aria-hidden="true">
+  <h3>Verwijderen?</h3>
+  <p style="margin:0;color:var(--mute);font-size:14px">Dit record wordt verwijderd en kan niet worden teruggezet.</p>
+  <div class="btns"><button type="button" class="cancel" id="cfNo">Annuleer</button><button type="button" class="save danger" id="cfYes">Verwijder</button></div>
+</form>
+
 <form class="sheet" id="evSheet" onsubmit="return false" aria-hidden="true">
   <h3 id="evTitle">Luier verschoond</h3>
   <label class="f" for="evDate">Datum</label>
   <input type="date" id="evDate">
   <label class="f" for="evTime">Tijdstip</label>
   <input type="time" id="evTime">
-  <label class="f">Wat zat er in de luier?</label>
+  <label class="f" id="kindsLbl">Wat zat er in de luier?</label>
   <div class="seg" id="kinds"><button type="button" id="kPee">Plas</button><button type="button" id="kPoop">Poep</button></div>
   <div id="colorBox" hidden>
     <label class="f" for="evColor">Kleur</label>
@@ -248,30 +307,63 @@ function fmtDate(s){var p=s.split('-'),d=new Date(+p[0],+p[1]-1,+p[2]);var t=tod
   var y=new Date();y.setDate(y.getDate()-1);if(s===y.getFullYear()+'-'+pad(y.getMonth()+1)+'-'+pad(y.getDate()))return 'Gisteren';
   return d.toLocaleDateString('nl-NL',{weekday:'long',day:'numeric',month:'long'});}
 function part(b){if(!b)return null;if(b.slaap)return b.side+': slaap (niet gelukt)';return b.side+': '+b.start+'–'+b.end+' ('+b.min+' min)';}
-var openRow=null;
+var histOpen=false,htab='feed',editId=null,editEvRef=null,cfFn=null;
+var IC_E='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+var IC_D='<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>';
+var ACT='<td class="ac"><button type="button" class="ib ed" aria-label="Aanpassen">'+IC_E+'</button><button type="button" class="ib dl" aria-label="Verwijderen">'+IC_D+'</button></td>';
+function wire(tr,onEdit,onDel){tr.querySelector('.ed').onclick=onEdit;tr.querySelector('.dl').onclick=onDel;}
+function askDelete(fn){cfFn=fn;$('scrim').classList.add('open');$('cfSheet').classList.add('open');$('cfSheet').setAttribute('aria-hidden','false');}
+$('cfNo').onclick=closeSheet;
+$('cfYes').onclick=function(){var f=cfFn;cfFn=null;closeSheet();if(f)f();};
+function pushFeed(rec){if(editId){state.feeds=state.feeds.filter(function(f){return f.id!==editId});rec.id=editId;}state.feeds.push(rec);}
+function editFeed(f){openSheet();editId=f.id;$('feedTitle').textContent='Voeding aanpassen';$('save').textContent='Bewaar wijzigingen';$('date').value=f.date;
+  if(f.type==='fles'){ftype='fles';syncType();$('ft').value=f.sort;$('fml').value=f.ml;return;}
+  first=f.b1.side;$('firstSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v===first)});names();
+  [[1,f.b1],[2,f.b2]].forEach(function(q){var n=q[0],b=q[1];if(!b)return;if(b.slaap){sl[n]=true;applySlaap(n);}else{$('s'+n).value=b.start;$('e'+n).value=b.end;calc(n);}});}
+function editEv(k,e){openEv();editEvRef={k:k,id:e.id};$('evTitle').textContent=k==='poop'?'Poepje aanpassen':'Plasje aanpassen';$('kinds').style.display='none';$('kindsLbl').style.display='none';$('evDate').value=e.date;$('evTime').value=e.time||'';sel.value=e.color||'';colorNote();$('colorBox').hidden=k!=='poop';}
+function syncH(){$('htabs').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.t===htab)});}
+$('openData').onclick=function(){histOpen=true;htab=tab;syncH();$('hist').classList.add('open');$('hist').setAttribute('aria-hidden','false');renderList();};
+$('histClose').onclick=function(){histOpen=false;$('hist').classList.remove('open');$('hist').setAttribute('aria-hidden','true');};
+$('htabs').querySelectorAll('button').forEach(function(b){b.onclick=function(){htab=b.dataset.t;syncH();renderList();};});
 function fStart(f){return f.type==='fles'?f.sort:((f.b1&&f.b1.start)||(f.b2&&f.b2.start)||'');}
 function fmtGap(m){var h=Math.floor(m/60);return h?h+'u '+pad(m%60)+'m':m+'m';}
-function sideCell(f,side){var u=false,z=false,m=0;[f.b1,f.b2].forEach(function(b){if(b&&b.side===side){u=true;if(b.slaap)z=true;else m+=b.min;}});return !u?'<span class="mut">–</span>':z?'<span class="z">slaap</span>':m;}
-function renderFeedTable(){var el=$('list');el.innerHTML='';
+function sideCell(f,side){var u=false,z=false,m=0;[f.b1,f.b2].forEach(function(b){if(b&&b.side===side){u=true;if(b.slaap)z=true;else m+=b.min;}});return !u?'<span class="mut">\u2013</span>':z?'<span class="z">slaap</span>':m;}
+function drawTable(el,k,only){if(k==='feed')drawFeeds(el,only);else drawEvents(el,k,only);}
+function drawFeeds(el,only){el.innerHTML='';
   if(!state.feeds.length){el.innerHTML='<div class="empty">Nog geen voedingen. Tik op Voeding toevoegen om de eerste te noteren.</div>';return;}
   var fs=state.feeds.slice().sort(function(a,b){return (a.date+(fStart(a)||'00:00'))>(b.date+(fStart(b)||'00:00'))?1:-1});
   var prev=null,num={},dn={},gap={};
   fs.forEach(function(f){if(!ok(f))return;var ts=startTs(f);dn[f.date]=(dn[f.date]||0)+1;num[f.id]=dn[f.date];if(ts!==null&&!isNaN(ts)){if(prev!==null)gap[f.id]=Math.round((ts-prev)/60000);prev=ts;}});
   var days=[];fs.forEach(function(f){if(days.indexOf(f.date)<0)days.push(f.date)});days.reverse();
+  if(only){var t0=todayStr();days=days.filter(function(d){return d===t0});if(!days.length){el.innerHTML='<div class="empty">Vandaag nog geen voedingen.</div>';return;}}
   var wrap=document.createElement('div');wrap.className='tw';var tb=document.createElement('table');tb.className='tbl';
-  tb.innerHTML='<colgroup><col style="width:38px"><col><col><col><col><col style="width:23%"></colgroup><thead><tr><th>#</th><th>Start</th><th>Links<small>min</small></th><th>Rechts<small>min</small></th><th>Totaal<small>min</small></th><th>Tussentijd</th></tr></thead>';
+  tb.innerHTML='<colgroup><col style="width:30px"><col><col><col><col><col style="width:62px"><col style="width:64px"></colgroup><thead><tr><th>#</th><th>Start</th><th>Links<small>min</small></th><th>Rechts<small>min</small></th><th>Totaal<small>min</small></th><th>Tussentijd</th><th></th></tr></thead>';
   var body=document.createElement('tbody');
   days.forEach(function(d){var rows=fs.filter(function(f){return f.date===d}).reverse(),c=rows.filter(ok).length;
-    var dr=document.createElement('tr');dr.className='dr';dr.innerHTML='<td colspan="6"><div><span>'+fmtDate(d)+'</span><span class="dc">'+c+(c===1?' voeding':' voedingen')+'</span></div></td>';body.appendChild(dr);
-    rows.forEach(function(f){var good=ok(f),tr=document.createElement('tr');tr.className='fr'+(openRow===f.id?' sel':'');
-      var mid=f.type==='fles'?'<td colspan="2" class="fl">Fles</td><td class="tt">'+f.ml+' ml</td>':'<td>'+sideCell(f,'Links')+'</td><td>'+sideCell(f,'Rechts')+'</td><td class="tt">'+(good?f.total:'<span class="mut">–</span>')+'</td>';
-      tr.innerHTML='<td><span class="nb'+(good?'':' off')+'">'+(good?num[f.id]:'–')+'</span></td><td>'+(fStart(f)||'–')+'</td>'+mid+'<td class="gp">'+(gap[f.id]!==undefined?fmtGap(gap[f.id]):'–')+'</td>';
-      tr.onclick=function(){openRow=openRow===f.id?null:f.id;renderFeedTable();};body.appendChild(tr);
-      if(openRow===f.id){var x=document.createElement('tr');x.className='fx';var td=document.createElement('td');td.colSpan=6;var b=document.createElement('button');b.className='del';b.type='button';b.textContent='Deze voeding verwijderen';var armed=false,tm;
-        b.onclick=function(){if(armed){clearTimeout(tm);state.feeds=state.feeds.filter(function(q){return q.id!==f.id});openRow=null;persist();renderAll();return;}armed=true;b.textContent='Zeker? Tik nogmaals';tm=setTimeout(function(){armed=false;b.textContent='Deze voeding verwijderen';},3000);};
-        td.appendChild(b);x.appendChild(td);body.appendChild(x);}});});
+    var dr=document.createElement('tr');dr.className='dr';dr.innerHTML='<td colspan="7"><div><span>'+fmtDate(d)+'</span><span class="dc">'+c+(c===1?' voeding':' voedingen')+'</span></div></td>';body.appendChild(dr);
+    rows.forEach(function(f){var good=ok(f),tr=document.createElement('tr');tr.className='fr';
+      var mid=f.type==='fles'?'<td colspan="2" class="fl">Fles</td><td class="tt">'+f.ml+' ml</td>':'<td>'+sideCell(f,'Links')+'</td><td>'+sideCell(f,'Rechts')+'</td><td class="tt">'+(good?f.total:'<span class="mut">\u2013</span>')+'</td>';
+      tr.innerHTML='<td><span class="nb'+(good?'':' off')+'">'+(good?num[f.id]:'\u2013')+'</span></td><td>'+(fStart(f)||'\u2013')+'</td>'+mid+'<td class="gp">'+(gap[f.id]!==undefined?fmtGap(gap[f.id]):'\u2013')+'</td>'+ACT;
+      wire(tr,function(){editFeed(f);},function(){askDelete(function(){state.feeds=state.feeds.filter(function(q){return q.id!==f.id});persist();renderAll();});});
+      body.appendChild(tr);});});
   tb.appendChild(body);wrap.appendChild(tb);el.appendChild(wrap);}
-function renderList(){if(tab!=='feed'){renderEvents();return;}renderFeedTable();return;var el=$('list');el.innerHTML='';
+function drawEvents(el,k,only){el.innerHTML='';var p=k==='poop',arr=state[k],nc=p?4:3;
+  if(!arr.length){el.innerHTML='<div class="empty">Nog niets genoteerd. Tik op Luier verschoond om iets toe te voegen.</div>';return;}
+  var asc=arr.slice().sort(function(a,b){return (a.date+(a.time||''))>(b.date+(b.time||''))?1:-1}),dn={},num={},days=[];
+  asc.forEach(function(e){dn[e.date]=(dn[e.date]||0)+1;num[e.id]=dn[e.date];if(days.indexOf(e.date)<0)days.push(e.date);});days.reverse();
+  if(only){var t0=todayStr();days=days.filter(function(d){return d===t0});if(!days.length){el.innerHTML='<div class="empty">Vandaag nog niets genoteerd.</div>';return;}}
+  var wrap=document.createElement('div');wrap.className='tw';var tb=document.createElement('table');tb.className='tbl';
+  tb.innerHTML='<colgroup><col style="width:40px"><col'+(p?' style="width:70px"':'')+'>'+(p?'<col>':'')+'<col style="width:66px"></colgroup><thead><tr><th>#</th><th>Tijd</th>'+(p?'<th style="text-align:left;padding-left:4px">Kleur</th>':'')+'<th></th></tr></thead>';
+  var body=document.createElement('tbody');
+  days.forEach(function(d){var rows=asc.filter(function(e){return e.date===d}).reverse(),c=rows.length;
+    var dr=document.createElement('tr');dr.className='dr';dr.innerHTML='<td colspan="'+nc+'"><div><span>'+fmtDate(d)+'</span><span class="dc">'+c+(p?(c===1?' poepje':' poepjes'):(c===1?' plasje':' plasjes'))+'</span></div></td>';body.appendChild(dr);
+    rows.forEach(function(e){var tr=document.createElement('tr');tr.className='fr';
+      var cc='';if(p){var col=colorOf(e.color);cc='<td class="kc">'+(col?'<span class="dot" style="background:'+col.c+'"></span>'+col.k+(col.w?' \u26a0':''):'<span class="mut">Kleur onbekend</span>')+'</td>';}
+      tr.innerHTML='<td><span class="nb">'+num[e.id]+'</span></td><td class="tt">'+(e.time||'\u2013')+'</td>'+cc+ACT;
+      wire(tr,function(){editEv(k,e);},function(){askDelete(function(){state[k]=state[k].filter(function(q){return q.id!==e.id});persist();renderAll();});});
+      body.appendChild(tr);});});
+  tb.appendChild(body);wrap.appendChild(tb);el.appendChild(wrap);}
+function renderList(){drawTable($('list'),tab,true);if(histOpen)drawTable($('histList'),htab,false);return;var el=$('list');el.innerHTML='';
   var fs=state.feeds.slice().sort(function(a,b){return (b.date+b.sort)>(a.date+a.sort)?1:-1});
   if(!fs.length){el.innerHTML='<div class="empty">Nog geen voedingen. Tik op + om de eerste toe te voegen.</div>';return;}
   var last='';
@@ -284,9 +376,10 @@ function renderList(){if(tab!=='feed'){renderEvents();return;}renderFeedTable();
     var x=document.createElement('button');x.textContent='✕';x.setAttribute('aria-label','Verwijder voeding');
     arm(x,function(){state.feeds=state.feeds.filter(function(q){return q.id!==f.id});persist();renderAll();});
     d.appendChild(x);el.appendChild(d);});}
-function renderNext(){var el=$('nextB');var fs=state.feeds.filter(function(f){return f.type!=='fles'}).sort(function(a,b){return (b.date+b.sort)>(a.date+a.sort)?1:-1});
-  if(!fs.length){el.textContent='–';return;}
-  var f=fs[0],s=f.b1.slaap?f.b1.side:(f.b2&&f.b2.slaap)?f.b2.side:(f.b2&&f.b2.min>0)?f.b2.side:f.b1.side;el.textContent=s;}
+function renderNext(){var el=$('nextB');
+  var fs=state.feeds.filter(function(f){return f.type!=='fles'&&f.b1}).sort(function(a,b){return (b.date+(fStart(b)||'00:00'))>(a.date+(fStart(a)||'00:00'))?1:-1});
+  if(!fs.length){el.textContent='\u2013';return;}
+  var f=fs[0],a=f.b1,b=f.b2;el.textContent=a.slaap?a.side:(b?b.side:a.side);}
 var lastTs=null;
 function startTs(f){var t=f.type==='fles'?f.sort:(f.b1&&f.b1.start)||(f.b2&&f.b2.start);if(!t)return null;var p=f.date.split('-'),h=t.split(':');return new Date(+p[0],+p[1]-1,+p[2],+h[0],+h[1]).getTime();}
 function tick(){var el=$('timer');if(lastTs===null||isNaN(lastTs)){el.textContent='–';return;}var s=Math.max(0,Math.floor((Date.now()-lastTs)/1000));el.textContent=Math.floor(s/3600)+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60);}
@@ -311,7 +404,60 @@ function impFeeds2(rows,r){rows.forEach(function(o){var date=nDate(o.datum);
   var dup=state.feeds.some(function(f){return (o.id&&f.id===o.id)||(f.b1&&(f.date+'|'+f.b1.side+'|'+(f.b1.start||'slaap')+'|'+(f.b2&&f.b2.start||''))===key)});
   if(dup){r.dup++;return;}
   state.feeds.push({id:o.id||('imp-'+key),date:date,sort:b1.start||'00:00',b1:b1,b2:b2,total:b1.min+(b2?b2.min:0)});r.feeds++;});}
-function renderAll(){renderRings();renderList();renderNext();renderTimer();renderCloud();}
+var ML_REF=70;
+var cfg={green:3,red:7};
+try{var cr=localStorage.getItem('babydashboard-cfg');if(cr){var cj=JSON.parse(cr);if(typeof cj.green==='number'&&typeof cj.red==='number'&&cj.green>=0&&cj.red>=cj.green)cfg=cj;}}catch(e){}
+function saveCfg(){try{localStorage.setItem('babydashboard-cfg',JSON.stringify(cfg));}catch(e){}}
+function cgNote(){var g=parseFloat($('cgGreen').value),r=parseFloat($('cgRed').value);
+  $('cgNote').textContent=(isNaN(g)||isNaN(r))?'':'Groen: gelijk of hoger, of tot '+fmt1(g)+' min lager. Oranje: tot '+fmt1(r)+' min lager. Rood: meer dan '+fmt1(r)+' min lager.';}
+$('gearBtn').onclick=function(){$('cgGreen').value=cfg.green;$('cgRed').value=cfg.red;$('cgErr').textContent='';cgNote();
+  $('scrim').classList.add('open');$('cgSheet').classList.add('open');$('cgSheet').setAttribute('aria-hidden','false');};
+$('cgGreen').oninput=cgNote;$('cgRed').oninput=cgNote;
+$('cgReset').onclick=function(){$('cgGreen').value=3;$('cgRed').value=7;cgNote();};
+$('cgCancel').onclick=closeSheet;
+$('cgSave').onclick=function(){var g=parseFloat($('cgGreen').value),r=parseFloat($('cgRed').value);
+  if(isNaN(g)||isNaN(r)||g<0||r<0){$('cgErr').textContent='Vul twee getallen van 0 of hoger in.';return;}
+  if(r<g){$('cgErr').textContent='De oranje grens moet gelijk zijn aan of hoger dan de groene grens.';return;}
+  cfg={green:g,red:r};saveCfg();closeSheet();renderAvg();};
+function dstr(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function sideMins(f,side){var m=0;[f.b1,f.b2].forEach(function(b){if(b&&b.side===side&&!b.slaap)m+=b.min;});return m;}
+function sumParts(a){var o={L:0,R:0,F:0};a.forEach(function(x){o.L+=x.L;o.R+=x.R;o.F+=x.F;});return o;}
+function drawParts(id,parts){var svg=$(id);svg.innerHTML='';var r=40,C=2*Math.PI*r;circle(svg,r,'var(--track)',12);
+  var used=parts.filter(function(p){return p.v>0}),tot=used.reduce(function(a,p){return a+p.v},0);if(tot<=0)return;
+  var off=0,gap=used.length>1?2.5:0;
+  used.forEach(function(p){var len=p.v/tot*C,c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx',50);c.setAttribute('cy',50);c.setAttribute('r',r);c.setAttribute('fill','none');c.setAttribute('stroke',p.c);c.setAttribute('stroke-width',12);
+    c.setAttribute('stroke-dasharray',Math.max(0.5,len-gap)+' '+C);c.setAttribute('stroke-dashoffset',-(off+gap/2));c.setAttribute('transform','rotate(-90 50 50)');svg.appendChild(c);off+=len;});}
+function renderAvg(){
+  var st=new Date();st.setDate(st.getDate()-6);var from=dstr(st),today=todayStr();
+  var wk=state.feeds.filter(function(f){return f.date>=from&&f.date<=today&&ok(f)});
+  var br=wk.filter(function(f){return f.type!=='fles'});
+  var A=br.length?br.reduce(function(a,f){return a+f.total},0)/br.length:0;
+  var ss=wk.map(function(f){return f.type==='fles'?{date:f.date,L:0,R:0,F:f.ml/ML_REF*A}:{date:f.date,L:sideMins(f,'Links'),R:sideMins(f,'Rechts'),F:0};});
+  var cols=['var(--feed)','var(--pee)','var(--poop)'];
+  if(!ss.length){$('avgN').textContent='\u2013';$('dayAvgN').textContent='\u2013';drawParts('avgSvg',[]);drawParts('dayAvgSvg',[]);todayDonut(null,0);return;}
+  var n=ss.length,t=sumParts(ss);
+  $('avgN').textContent=Math.round((t.L+t.R+t.F)/n);
+  drawParts('avgSvg',[{v:t.L,c:cols[0]},{v:t.R,c:cols[1]},{v:t.F,c:cols[2]}]);
+  var by={};ss.forEach(function(x){(by[x.date]=by[x.date]||[]).push(x);});
+  var days=Object.keys(by),full=days.filter(function(d){return d!==today}),sub;
+  if(full.length){days=full;sub='excl. vandaag';}else{sub='alleen vandaag (onvolledig)';}
+  $('daySub').textContent=sub;
+  var dt={L:0,R:0,F:0};days.forEach(function(d){var q=sumParts(by[d]);dt.L+=q.L;dt.R+=q.R;dt.F+=q.F;});
+  var k=days.length;$('dayAvgN').textContent=Math.round((dt.L+dt.R+dt.F)/k);
+  drawParts('dayAvgSvg',[{v:dt.L,c:cols[0]},{v:dt.R,c:cols[1]},{v:dt.F,c:cols[2]}]);
+  var td=ss.filter(function(x){return x.date===today}),wa=(t.L+t.R+t.F)/n,tt=sumParts(td);
+  todayDonut(td.length?(tt.L+tt.R+tt.F)/td.length:null,wa);}
+function fmt1(x){return String(x).replace('.',',');}
+function todayDonut(ta,wa){var svg=$('todSvg');svg.innerHTML='';circle(svg,40,'var(--track)',12);
+  if(ta===null){$('todN').textContent='\u2013';$('todSub').textContent='nog geen voeding';return;}
+  var diff=ta-wa,col=diff>=-cfg.green?'#2f9e5b':diff>=-cfg.red?'#e08a2c':'#d64541',C=2*Math.PI*40,frac=wa>0?Math.min(1,ta/wa):1;
+  var c=document.createElementNS(NS,'circle');c.setAttribute('cx',50);c.setAttribute('cy',50);c.setAttribute('r',40);c.setAttribute('fill','none');c.setAttribute('stroke',col);c.setAttribute('stroke-width',12);
+  if(frac<1){c.setAttribute('stroke-dasharray',(frac*C)+' '+C);c.setAttribute('transform','rotate(-90 50 50)');}
+  svg.appendChild(c);
+  $('todN').textContent=Math.round(ta);var d=Math.round(diff*10)/10;
+  $('todSub').textContent=(d>0?'+'+fmt1(d):d<0?'\u2212'+fmt1(Math.abs(d)):'\u00b10')+' min t.o.v. week';}
+function renderAll(){renderRings();renderList();renderNext();renderTimer();renderCloud();renderAvg();}
 
 /* ---- poep/plas ---- */
 /* ---- poep, plas en tabs ---- */
@@ -334,10 +480,13 @@ function nowHM(){var d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes(
 var kind={pee:false,poop:false};
 function syncKinds(){$('kPee').classList.toggle('on',kind.pee);$('kPoop').classList.toggle('on',kind.poop);$('colorBox').hidden=!kind.poop;}
 $('kPee').onclick=function(){kind.pee=!kind.pee;syncKinds();};$('kPoop').onclick=function(){kind.poop=!kind.poop;syncKinds();};
-function openEv(){kind={pee:false,poop:false};syncKinds();$('evDate').value=todayStr();$('evTime').value=nowHM();sel.value='';colorNote();$('evErr').textContent='';$('scrim').classList.add('open');$('evSheet').classList.add('open');$('evSheet').setAttribute('aria-hidden','false');}
+function openEv(){editEvRef=null;$('evTitle').textContent='Luier verschoond';$('kinds').style.display='';$('kindsLbl').style.display='';kind={pee:false,poop:false};syncKinds();$('evDate').value=todayStr();$('evTime').value=nowHM();sel.value='';colorNote();$('evErr').textContent='';$('scrim').classList.add('open');$('evSheet').classList.add('open');$('evSheet').setAttribute('aria-hidden','false');}
 $('addDiaper').onclick=openEv;$('evCancel').onclick=closeSheet;
 $('evSave').onclick=function(){var d=$('evDate').value,t=nTime($('evTime').value||'');
   if(!d){$('evErr').textContent='Kies een datum.';return;}if(!t){$('evErr').textContent='Vul een tijdstip in.';return;}
+  if(editEvRef){var it=null;state[editEvRef.k].forEach(function(q){if(q.id===editEvRef.id)it=q;});
+    if(it){if(editEvRef.k==='poop'){if(!sel.value){$('evErr').textContent='Kies een kleur.';return;}it.color=sel.value;}it.date=d;it.time=t;}
+    editEvRef=null;persist();closeSheet();renderAll();return;}
   if(!kind.pee&&!kind.poop){$('evErr').textContent='Kies plas, poep of allebei.';return;}
   if(kind.poop&&!sel.value){$('evErr').textContent='Kies een kleur.';return;}
   var id=Date.now()+''+Math.random();
@@ -347,25 +496,7 @@ $('evSave').onclick=function(){var d=$('evDate').value,t=nTime($('evTime').value
 function syncTabs(){$('tabs').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.t===tab)});}
 $('tabs').querySelectorAll('button').forEach(function(b){b.onclick=function(){tab=b.dataset.t;syncTabs();renderList();};});
 function arm(btn,fn){var t;btn.onclick=function(){if(btn.dataset.a){clearTimeout(t);fn();return;}btn.dataset.a='1';btn.textContent='Zeker?';btn.style.fontSize='13px';t=setTimeout(function(){btn.dataset.a='';btn.textContent='✕';btn.style.fontSize='';},3000);};}
-var openEvRow=null;
-function renderEventTable(){var el=$('list');el.innerHTML='';var k=tab,p=k==='poop',arr=state[k],nc=p?3:2;
-  if(!arr.length){el.innerHTML='<div class="empty">Nog niets genoteerd. Tik op Luier verschoond om iets toe te voegen.</div>';return;}
-  var asc=arr.slice().sort(function(a,b){return (a.date+(a.time||''))>(b.date+(b.time||''))?1:-1}),dn={},num={},days=[];
-  asc.forEach(function(e){dn[e.date]=(dn[e.date]||0)+1;num[e.id]=dn[e.date];if(days.indexOf(e.date)<0)days.push(e.date);});days.reverse();
-  var wrap=document.createElement('div');wrap.className='tw';var tb=document.createElement('table');tb.className='tbl';
-  tb.innerHTML='<colgroup><col style="width:44px"><col'+(p?' style="width:90px"':'')+'>'+(p?'<col>':'')+'</colgroup><thead><tr><th>#</th><th>Tijd</th>'+(p?'<th style="text-align:left;padding-left:4px">Kleur</th>':'')+'</tr></thead>';
-  var body=document.createElement('tbody');
-  days.forEach(function(d){var rows=asc.filter(function(e){return e.date===d}).reverse(),c=rows.length;
-    var dr=document.createElement('tr');dr.className='dr';dr.innerHTML='<td colspan="'+nc+'"><div><span>'+fmtDate(d)+'</span><span class="dc">'+c+(p?(c===1?' poepje':' poepjes'):(c===1?' plasje':' plasjes'))+'</span></div></td>';body.appendChild(dr);
-    rows.forEach(function(e){var tr=document.createElement('tr');tr.className='fr'+(openEvRow===e.id?' sel':'');
-      var cc='';if(p){var col=colorOf(e.color);cc='<td class="kc">'+(col?'<span class="dot" style="background:'+col.c+'"></span>'+col.k+(col.w?' ⚠':''):'<span class="mut">Kleur onbekend</span>')+'</td>';}
-      tr.innerHTML='<td><span class="nb">'+num[e.id]+'</span></td><td class="tt">'+(e.time||'–')+'</td>'+cc;
-      tr.onclick=function(){openEvRow=openEvRow===e.id?null:e.id;renderEventTable();};body.appendChild(tr);
-      if(openEvRow===e.id){var x=document.createElement('tr');x.className='fx';var td=document.createElement('td');td.colSpan=nc;td.style.textAlign='center';var b=document.createElement('button');b.className='del';b.type='button';b.textContent='Verwijderen';var armed=false,tm;
-        b.onclick=function(){if(armed){clearTimeout(tm);state[k]=state[k].filter(function(q){return q.id!==e.id});openEvRow=null;persist();renderAll();return;}armed=true;b.textContent='Zeker? Tik nogmaals';tm=setTimeout(function(){armed=false;b.textContent='Verwijderen';},3000);};
-        td.appendChild(b);x.appendChild(td);body.appendChild(x);}});});
-  tb.appendChild(body);wrap.appendChild(tb);el.appendChild(wrap);}
-function renderEvents(){renderEventTable();return;var el=$('list');el.innerHTML='';var arr=state[tab];
+function renderEvents(){return;var el=$('list');el.innerHTML='';var arr=state[tab];
   if(!arr.length){el.innerHTML='<div class="empty">Nog niets genoteerd. Tik op Luier verschoond om iets toe te voegen.</div>';return;}
   var s=arr.slice().sort(function(a,b){return (b.date+(b.time||''))>(a.date+(a.time||''))?1:-1}),last='';
   s.forEach(function(e){if(e.date!==last){last=e.date;var h=document.createElement('div');h.className='day';h.textContent=fmtDate(e.date);el.appendChild(h);}
@@ -386,11 +517,11 @@ function calc(n){var m=$('m'+n);if(sl[n]){m.textContent='Slaap';return 0;}var v=
 function applySlaap(n){var on=sl[n];$('z'+n).classList.toggle('on',on);$('s'+n).disabled=on;$('e'+n).disabled=on;if(on){$('s'+n).value='';$('e'+n).value='';}calc(n);}
 [1,2].forEach(function(n){$('s'+n).oninput=function(){calc(n)};$('e'+n).oninput=function(){calc(n)};$('z'+n).onclick=function(){sl[n]=!sl[n];applySlaap(n);};});
 $('firstSeg').querySelectorAll('button').forEach(function(b){b.onclick=function(){first=b.dataset.v;$('firstSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b)});names();};});
-function openSheet(){ftype='borst';syncType();$('ft').value=nowHM();$('fml').value='';$('date').value=todayStr();first='Links';sl={1:false,2:false};$('firstSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='Links')});
+function openSheet(){editId=null;$('feedTitle').textContent='Voeding toevoegen';$('save').textContent='Bewaar voeding';ftype='borst';syncType();$('ft').value=nowHM();$('fml').value='';$('date').value=todayStr();first='Links';sl={1:false,2:false};$('firstSeg').querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x.dataset.v==='Links')});
   ['s1','e1','s2','e2'].forEach(function(i){$(i).value=''});names();applySlaap(1);applySlaap(2);$('err').textContent='';
   $('scrim').classList.add('open');$('sheet').classList.add('open');$('sheet').setAttribute('aria-hidden','false');}
-function closeSheet(){$('evSheet').classList.remove('open');$('evSheet').setAttribute('aria-hidden','true');$('scrim').classList.remove('open');$('sheet').classList.remove('open');$('sheet').setAttribute('aria-hidden','true');}
-$('addFeed').onclick=openSheet;$('cancel').onclick=closeSheet;$('scrim').onclick=closeSheet;
+function closeSheet(){$('cgSheet').classList.remove('open');$('cgSheet').setAttribute('aria-hidden','true');$('cfSheet').classList.remove('open');$('cfSheet').setAttribute('aria-hidden','true');$('evSheet').classList.remove('open');$('evSheet').setAttribute('aria-hidden','true');$('scrim').classList.remove('open');$('sheet').classList.remove('open');$('sheet').setAttribute('aria-hidden','true');}
+$('addFeed').onclick=function(){openSheet();};$('cancel').onclick=closeSheet;$('scrim').onclick=closeSheet;
 function breast(n,side){if(sl[n])return {side:side,slaap:true,min:0};var s=$('s'+n).value,e=$('e'+n).value;
   if(!s&&!e)return null;if(!s||!e)return 'half';return {side:side,start:s,end:e,min:mins(s,e)};}
 $('save').onclick=function(){
@@ -398,13 +529,13 @@ $('save').onclick=function(){
   if(ftype==='fles'){var ft=nTime($('ft').value||''),ml=parseInt($('fml').value,10);
     if(!ft){$('err').textContent='Vul een tijdstip in.';return;}
     if(isNaN(ml)||ml<=0){$('err').textContent='Vul het aantal ml in.';return;}
-    state.feeds.push({id:Date.now()+''+Math.random(),date:$('date').value,sort:ft,type:'fles',ml:ml,total:0});persist();closeSheet();tab='feed';syncTabs();renderAll();return;}
+    pushFeed({id:Date.now()+''+Math.random(),date:$('date').value,sort:ft,type:'fles',ml:ml,total:0});persist();closeSheet();tab='feed';syncTabs();renderAll();return;}
   var b1=breast(1,first),b2=breast(2,other(first));
   if(!b1||b1==='half'){$('err').textContent='Vul bij de eerste borst start- en eindtijd in, of kies Slaap.';return;}
   if(b2==='half'){$('err').textContent='Vul bij de tweede borst start- en eindtijd in, of kies Slaap.';return;}
   var total=b1.min+(b2?b2.min:0);
   var sort=(b1.start||'00:00');
-  state.feeds.push({id:Date.now()+''+Math.random(),date:$('date').value,sort:sort,b1:b1,b2:b2,total:total});
+  pushFeed({id:Date.now()+''+Math.random(),date:$('date').value,sort:sort,b1:b1,b2:b2,total:total});
   persist();closeSheet();renderAll();};
 
 /* ---- back-up & import ---- */
@@ -470,15 +601,17 @@ showLast();
 
 /* ---- online synchronisatie (Firebase) ---- */
 function C(){return window.cloudApi||null}
+function canon(v){if(Array.isArray(v))return v.map(canon);if(v&&typeof v==='object'){var r={};Object.keys(v).sort().forEach(function(k){r[k]=canon(v[k]);});return r;}return v;}
+function sig(e){return JSON.stringify(canon(e));}
 var cuser=null,cerr='',remote={feeds:{},poop:{},pee:{}};
 function saveLocal(){mem=state;try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
 function fail(e){cerr=(e&&e.code)||'fout';renderCloud();}
 function cloudSync(){var api=C();if(!api||!cuser)return;
   ['feeds','poop','pee'].forEach(function(k){var cur={};
-    state[k].forEach(function(e){cur[e.id]=1;if(!remote[k][e.id]){remote[k][e.id]=true;api.set(k,e).catch(fail);}});
+    state[k].forEach(function(e){cur[e.id]=1;var sg=sig(e);if(remote[k][e.id]!==sg){remote[k][e.id]=sg;api.set(k,e).catch(fail);}});
     Object.keys(remote[k]).forEach(function(id){if(!cur[id]){delete remote[k][id];api.del(k,id).catch(fail);}});});}
 window.__cloudUser=function(email){cuser=email;if(!email)remote={feeds:{},poop:{},pee:{}};renderCloud();};
-window.__cloudData=function(k,docs){var ids={},m={};docs.forEach(function(d){ids[d.id]=1;m[d.id]=true;});
+window.__cloudData=function(k,docs){var ids={},m={};docs.forEach(function(d){ids[d.id]=1;m[d.id]=sig(d);});
   var keep=state[k].filter(function(e){return !ids[e.id]&&!remote[k][e.id];});
   remote[k]=m;state[k]=docs.concat(keep);saveLocal();renderAll();cloudSync();};
 window.__cloudError=fail;
