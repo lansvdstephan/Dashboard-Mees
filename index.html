@@ -107,6 +107,11 @@ input:disabled{opacity:.45}
 .ringbox{position:relative}
 .gear{position:absolute;z-index:2;top:4px;right:4px;width:32px;height:32px;border:0;background:transparent;color:var(--mute);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .gear:active{background:var(--bg)}
+.chartcard{background:var(--card);border-radius:20px;padding:14px 10px 12px;margin-top:14px}
+.chartcard .ch{font-size:14px;font-weight:800;margin:0 4px 6px}
+.chartcard svg{display:block;width:100%;height:auto}
+.chartcard .leg{flex-wrap:wrap;gap:6px 14px;margin-top:6px}
+.chartcard .leg svg{display:inline-block;width:20px;height:8px;vertical-align:middle}
 .sub2{font-size:11px;color:var(--mute);margin-top:2px;padding:0 4px}
 .leg{display:flex;justify-content:center;gap:16px;font-size:12px;color:var(--mute);margin:8px 0 0}
 .tbl{width:100%;border-collapse:collapse;table-layout:fixed;font-variant-numeric:tabular-nums}
@@ -180,6 +185,7 @@ input:disabled{opacity:.45}
   <div class="hrow"><h2>Vandaag</h2><button type="button" id="openData" class="dbtn">Data</button></div>
   <div class="seg three" id="tabs"><button type="button" data-t="feed" class="on">Voeding</button><button type="button" data-t="poop">Poep</button><button type="button" data-t="pee">Plas</button></div>
   <div id="list"></div>
+  <div class="chartcard"><div class="ch">Laatste 15 drinksessies</div><div id="barBox"></div><div class="leg" id="barLeg"></div></div>
 
   <h2>Back-up en import</h2>
   <div class="backup">
@@ -404,7 +410,7 @@ function impFeeds2(rows,r){rows.forEach(function(o){var date=nDate(o.datum);
   var dup=state.feeds.some(function(f){return (o.id&&f.id===o.id)||(f.b1&&(f.date+'|'+f.b1.side+'|'+(f.b1.start||'slaap')+'|'+(f.b2&&f.b2.start||''))===key)});
   if(dup){r.dup++;return;}
   state.feeds.push({id:o.id||('imp-'+key),date:date,sort:b1.start||'00:00',b1:b1,b2:b2,total:b1.min+(b2?b2.min:0)});r.feeds++;});}
-var ML_REF=70;
+var ML_REF=70,weekA=0,weekAvg=null;
 var cfg={green:3,red:7};
 try{var cr=localStorage.getItem('babydashboard-cfg');if(cr){var cj=JSON.parse(cr);if(typeof cj.green==='number'&&typeof cj.red==='number'&&cj.green>=0&&cj.red>=cj.green)cfg=cj;}}catch(e){}
 function saveCfg(){try{localStorage.setItem('babydashboard-cfg',JSON.stringify(cfg));}catch(e){}}
@@ -432,11 +438,11 @@ function renderAvg(){
   var st=new Date();st.setDate(st.getDate()-6);var from=dstr(st),today=todayStr();
   var wk=state.feeds.filter(function(f){return f.date>=from&&f.date<=today&&ok(f)});
   var br=wk.filter(function(f){return f.type!=='fles'});
-  var A=br.length?br.reduce(function(a,f){return a+f.total},0)/br.length:0;
+  var A=br.length?br.reduce(function(a,f){return a+f.total},0)/br.length:0;weekA=A;weekAvg=null;
   var ss=wk.map(function(f){return f.type==='fles'?{date:f.date,L:0,R:0,F:f.ml/ML_REF*A}:{date:f.date,L:sideMins(f,'Links'),R:sideMins(f,'Rechts'),F:0};});
   var cols=['var(--feed)','var(--pee)','var(--poop)'];
   if(!ss.length){$('avgN').textContent='\u2013';$('dayAvgN').textContent='\u2013';drawParts('avgSvg',[]);drawParts('dayAvgSvg',[]);todayDonut(null,0);return;}
-  var n=ss.length,t=sumParts(ss);
+  var n=ss.length,t=sumParts(ss);weekAvg=(t.L+t.R+t.F)/n;
   $('avgN').textContent=Math.round((t.L+t.R+t.F)/n);
   drawParts('avgSvg',[{v:t.L,c:cols[0]},{v:t.R,c:cols[1]},{v:t.F,c:cols[2]}]);
   var by={};ss.forEach(function(x){(by[x.date]=by[x.date]||[]).push(x);});
@@ -457,7 +463,26 @@ function todayDonut(ta,wa){var svg=$('todSvg');svg.innerHTML='';circle(svg,40,'v
   svg.appendChild(c);
   $('todN').textContent=Math.round(ta);var d=Math.round(diff*10)/10;
   $('todSub').textContent=(d>0?'+'+fmt1(d):d<0?'\u2212'+fmt1(Math.abs(d)):'\u00b10')+' min t.o.v. week';}
-function renderAll(){renderRings();renderList();renderNext();renderTimer();renderCloud();renderAvg();}
+function renderBars(){var el=$('barBox'),lg=$('barLeg');if(!el)return;
+  var all=state.feeds.filter(ok).map(function(f){return {f:f,ts:startTs(f)}}).filter(function(x){return x.ts!==null&&!isNaN(x.ts)}).sort(function(a,b){return a.ts-b.ts}).slice(-15);
+  if(!all.length){el.innerHTML='<div class="empty">Nog geen drinksessies.</div>';lg.innerHTML='';return;}
+  var rows=all.map(function(x){var f=x.f,L=0,R=0,F=0;if(f.type==='fles')F=f.ml/ML_REF*weekA;else{L=sideMins(f,'Links');R=sideMins(f,'Rechts');}return {ts:x.ts,L:L,R:R,F:F,T:L+R+F};});
+  var mx=Math.max.apply(null,rows.map(function(r){return r.T}).concat([weekAvg||0])),step=mx<=20?5:mx<=50?10:20,top=Math.max(step,Math.ceil(mx/step)*step);
+  var W=340,H=236,ml=28,mr=6,mt=14,mb=64,pw=W-ml-mr,ph=H-mt-mb,slot=pw/15,bw=slot*0.68,off=(15-rows.length)*slot;
+  function Y(v){return mt+ph-(v/top)*ph;}
+  var o='<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Drinktijd van de laatste 15 drinksessies">';
+  for(var g=0;g<=top;g+=step){var yy=Y(g);o+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+yy+'" y2="'+yy+'" stroke="var(--line)" stroke-width="1"/><text x="'+(ml-4)+'" y="'+(yy+3)+'" text-anchor="end" font-size="9" fill="var(--mute)">'+g+'</text>';}
+  var prevDay='';
+  rows.forEach(function(r,i){var x=ml+off+i*slot+(slot-bw)/2,cx=x+bw/2,yb=Y(0),acc=0;
+    [[r.L,'var(--feed)'],[r.R,'var(--pee)'],[r.F,'var(--poop)']].forEach(function(q){if(q[0]<=0)return;var y1=Y(acc+q[0]),y0=Y(acc);o+='<rect x="'+x+'" y="'+y1+'" width="'+bw+'" height="'+(y0-y1)+'" fill="'+q[1]+'"/>';acc+=q[0];});
+    if(r.T>0)o+='<text x="'+cx+'" y="'+(Y(r.T)-3)+'" text-anchor="middle" font-size="8.5" font-weight="700" fill="var(--ink)">'+Math.round(r.T)+'</text>';
+    var d=new Date(r.ts),dd=pad(d.getDate())+'/'+pad(d.getMonth()+1),lb=(dd!==prevDay?dd+' ':'')+pad(d.getHours())+':'+pad(d.getMinutes());prevDay=dd;
+    o+='<text transform="rotate(-90 '+(cx+3)+' '+(yb+6)+')" x="'+(cx+3)+'" y="'+(yb+6)+'" text-anchor="end" font-size="9" fill="var(--mute)">'+lb+'</text>';});
+  if(weekAvg!==null){var ya=Y(weekAvg);o+='<line x1="'+ml+'" x2="'+(W-mr)+'" y1="'+ya+'" y2="'+ya+'" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="5 3"/>';}
+  o+='</svg>';el.innerHTML=o;
+  lg.innerHTML='<span><span class="dot" style="background:var(--feed)"></span>Links</span><span><span class="dot" style="background:var(--pee)"></span>Rechts</span><span><span class="dot" style="background:var(--poop)"></span>Fles</span>'+
+    (weekAvg!==null?'<span><svg viewBox="0 0 20 8" aria-hidden="true"><line x1="0" x2="20" y1="4" y2="4" stroke="var(--ink)" stroke-width="1.5" stroke-dasharray="5 3"/></svg> 7-daags gem. '+fmt1(Math.round(weekAvg*10)/10)+' min</span>':'');}
+function renderAll(){renderRings();renderList();renderNext();renderTimer();renderCloud();renderAvg();renderBars();}
 
 /* ---- poep/plas ---- */
 /* ---- poep, plas en tabs ---- */
