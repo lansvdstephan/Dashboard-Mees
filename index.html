@@ -167,7 +167,7 @@ input:disabled{opacity:.45}
       <div class="lbl">Per sessie</div><div class="sub2">afgelopen 7 dagen</div>
     </div>
     <div class="ringbox">
-      <div class="ring"><svg viewBox="0 0 100 100" id="dayAvgSvg" aria-hidden="true"></svg><div class="n"><b id="dayAvgN">&ndash;</b><small>min</small></div></div>
+      <div class="ring"><svg viewBox="0 0 100 100" id="dayAvgSvg" aria-hidden="true"></svg><div class="n"><b id="dayAvgN">&ndash;</b><small id="dayAvgS">min</small></div></div>
       <div class="lbl">Per dag</div><div class="sub2" id="daySub">afgelopen 7 dagen</div>
     </div>
   <div class="ringbox">
@@ -441,7 +441,7 @@ function renderAvg(){
   var A=br.length?br.reduce(function(a,f){return a+f.total},0)/br.length:0;weekA=A;weekAvg=null;
   var ss=wk.map(function(f){return f.type==='fles'?{date:f.date,L:0,R:0,F:f.ml/ML_REF*A}:{date:f.date,L:sideMins(f,'Links'),R:sideMins(f,'Rechts'),F:0};});
   var cols=['var(--feed)','var(--pee)','var(--poop)'];
-  if(!ss.length){$('avgN').textContent='\u2013';$('dayAvgN').textContent='\u2013';drawParts('avgSvg',[]);drawParts('dayAvgSvg',[]);todayDonut(null,0);return;}
+  if(!ss.length){$('avgN').textContent='\u2013';$('dayAvgN').textContent='\u2013';$('dayAvgS').textContent='min';drawParts('avgSvg',[]);drawParts('dayAvgSvg',[]);todayDonut(null,0);return;}
   var n=ss.length,t=sumParts(ss);weekAvg=(t.L+t.R+t.F)/n;
   $('avgN').textContent=Math.round((t.L+t.R+t.F)/n);
   drawParts('avgSvg',[{v:t.L,c:cols[0]},{v:t.R,c:cols[1]},{v:t.F,c:cols[2]}]);
@@ -450,10 +450,18 @@ function renderAvg(){
   if(full.length){days=full;sub='excl. vandaag';}else{sub='alleen vandaag (onvolledig)';}
   $('daySub').textContent=sub;
   var dt={L:0,R:0,F:0};days.forEach(function(d){var q=sumParts(by[d]);dt.L+=q.L;dt.R+=q.R;dt.F+=q.F;});
-  var k=days.length;$('dayAvgN').textContent=Math.round((dt.L+dt.R+dt.F)/k);
-  drawParts('dayAvgSvg',[{v:dt.L,c:cols[0]},{v:dt.R,c:cols[1]},{v:dt.F,c:cols[2]}]);
+  var k=days.length,avgDay=(dt.L+dt.R+dt.F)/k,tdT=sumParts(ss.filter(function(x){return x.date===today})),todayTot=tdT.L+tdT.R+tdT.F;dayDonut(todayTot,avgDay,full.length>0);
+  
   var td=ss.filter(function(x){return x.date===today}),wa=(t.L+t.R+t.F)/n,tt=sumParts(td);
   todayDonut(td.length?(tt.L+tt.R+tt.F)/td.length:null,wa);}
+function dayDonut(tot,avg,hasAvg){var svg=$('dayAvgSvg');svg.innerHTML='';circle(svg,40,'var(--track)',12);
+  var n=$('dayAvgN'),sm=$('dayAvgS');n.textContent=Math.round(tot);
+  if(!hasAvg){sm.textContent='min';$('daySub').textContent='nog geen daggemiddelde';return;}
+  var frac=avg>0?Math.min(1,tot/avg):0,C=2*Math.PI*40;
+  if(frac>0){var c=document.createElementNS(NS,'circle');c.setAttribute('cx',50);c.setAttribute('cy',50);c.setAttribute('r',40);c.setAttribute('fill','none');c.setAttribute('stroke','var(--feed)');c.setAttribute('stroke-width',12);
+    if(frac<1){c.setAttribute('stroke-dasharray',(frac*C)+' '+C);c.setAttribute('transform','rotate(-90 50 50)');}svg.appendChild(c);}
+  sm.textContent='/'+Math.round(avg)+' min';
+  $('daySub').textContent=Math.round(avg>0?tot/avg*100:0)+'% van daggemiddelde';}
 function fmt1(x){return String(x).replace('.',',');}
 function todayDonut(ta,wa){var svg=$('todSvg');svg.innerHTML='';circle(svg,40,'var(--track)',12);
   if(ta===null){$('todN').textContent='\u2013';$('todSub').textContent='nog geen voeding';return;}
